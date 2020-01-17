@@ -205,7 +205,7 @@ resource "aws_api_gateway_integration" "lambda" {
  resource "aws_lambda_permission" "apigw" {
    statement_id  = "AllowAPIGatewayInvoke"
    action        = "lambda:InvokeFunction"
-   function_name = "${aws_lambda_function.article_rating_service_lambda_function.function_name}"
+   function_name = "${aws_lambda_function.article_rating_service_lambda_function.arn}"
    principal     = "apigateway.amazonaws.com"
 
    
