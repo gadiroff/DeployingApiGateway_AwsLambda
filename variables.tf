@@ -1,10 +1,10 @@
 variable "role" {
-  default = "article_rating_service"
+  default = "article-rating-service"
 }
 
 
 variable "finance_product" {
-   default = "article_rating_service"
+   default = "article-rating-service"
 }
 
 variable "finance_owner" {
@@ -35,34 +35,36 @@ variable "security_groups" {
 
 variable "article_rating_service" {
   default = {
-    name               = "article_rating_service"
+    name               = "article-rating-service"
     s3_bucket          = "epic-lambda-artifacts"
-    timeout            = 600
+    timeout            = 60
     memory_size        = 256
-    trigger_rate       = "rate(60 minutes)"
   }
 }
 
-########################
-### Elevio variables ###
-########################
 
 
-variable "elevio_api_key" {}
+####################################
+####### POSTGRESQL Variables #######
+####################################
 
-variable "elevio_auth_token" {}
-
-variable "elevio_hash" {
-  default = "3d1f26f7d02620a4df15dcdd70435eaf9548cd9f9dc47c3c6120bb797b3c10d8"
-}
-variable "elevio_user_email" {
-  default = "vitali.gorobets@epicgames.com"
+variable "pguser" {
+  default = "admin"
 }
 
-variable "elastic_url" {
-  default = "http://support-kb-service-es-gamedev.ol.epicgames.net/"
+variable "pghost" {
+  edfault = "localhost"
 }
 
-variable "elevio_endpoint" {
-  default = "https://api.elev.io/v1"
+variable "pgpassword" {
+  default = "admin"
 }
+
+variable "pgdatabase" {
+  default = "ratings"
+}
+
+variable "pgport" {
+  default = "5431"
+}
+

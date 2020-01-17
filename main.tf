@@ -16,25 +16,25 @@ provider "aws" {
 
 
 
-######################
-### Lambda Archive ###
-######################
+# ######################
+# ### Lambda Archive ###
+# ######################
 
 
-resource "local_file" "latest_zip" {
-  filename = "${path.module}/latest.js"
-}
+# resource "local_file" "latest_zip" {
+#   filename = "${path.module}/latest.js"
+# }
 
 
-data "archive_file" "lambda_archive" {
-  type        = "zip"
-  output_path = "${path.module}/latest.zip"
+# data "archive_file" "lambda_archive" {
+#   type        = "zip"
+#   output_path = "${path.module}/latest.zip"
 
-  source {
-    content  = "console.log('Hello World')"
-    filename = "latest.js"
-  }
-}
+#   source {
+#     content  = "console.log('Hello World')"
+#     filename = "latest.js"
+#   }
+# }
 
   
 ###########################
@@ -60,12 +60,11 @@ resource "aws_lambda_function" "article_rating_service_lambda_function" {
 
   environment = {
     variables = {
-      "EPIC_PST_SSP_ELEVIO_ENDPOINT"    = "${var.elevio_endpoint}"
-      "EPIC_PST_SSP_ELASTIC_URL"        = "${var.elastic_url}"
-      "EPIC_PST_SSP_ELEVIO_API_KEY"     = "${var.elevio_api_key}"
-      "EPIC_PST_SSP_ELEVIO_AUTH_TOKEN"  = "${var.elevio_auth_token}"
-      "EPIC_PST_SSP_ELEVIO_USER_EMAIL"  = "${var.elevio_user_email}"
-      "EPIC_PST_SSP_ELEVIO_HASH"        = "${var.elevio_hash}"
+      "EPIC_PST_SSP_PGUSER"    = "${var.pguser}"
+      "EPIC_PST_SSP_PGHOST"        = "${var.pghost}"
+      "EPIC_PST_SSP_PGPASSWORD"     = "${var.pgpassword}"
+      "EPIC_PST_SSP_PGDATABASE"  = "${var.pgdatabase}"
+      "EPIC_PST_SSP_PGPORT"  = "${var.pgport}"
 
     }
   }
