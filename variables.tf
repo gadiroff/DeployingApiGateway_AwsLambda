@@ -53,7 +53,7 @@ variable "pguser" {
 }
 
 variable "pghost" {
-  edfault = "localhost"
+  default = "localhost"
 }
 
 variable "pgpassword" {
