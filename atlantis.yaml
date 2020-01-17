@@ -1,2 +1,2 @@
 ---
-vault_secret_path: "secret/data/terraform/terraform/web/support-kb-content-loader/"
+vault_secret_path: "secret/data/terraform/terraform/web/article-rating-service/"
