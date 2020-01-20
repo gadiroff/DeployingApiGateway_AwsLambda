@@ -146,8 +146,8 @@ resource "aws_iam_policy_attachment" "article_rating_service_lambda_attach" {
 
 
 resource "aws_api_gateway_rest_api" "main" {
-  name        = "article-rating-service"
-  description = "article-rating-service"
+  name        = "${var.role}-${var.env}"
+  description = "${var.role}-${var.env}"
 }
 
 
