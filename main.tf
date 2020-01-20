@@ -46,7 +46,7 @@ resource "aws_lambda_function" "article_rating_service_lambda_function" {
   role          = "${aws_iam_role.article_rating_service_lambda_role.arn}"
   s3_bucket     = "${var.article_rating_service["s3_bucket"]}"
   s3_key        = "article-rating-service/${var.env}/article-rating-service.zip"   
-  handler       = "index.handler"
+  handler       = "handler.createArticleRating"
   timeout       = "${var.article_rating_service["timeout"]}"
   memory_size   = "${var.article_rating_service["memory_size"]}"
 
