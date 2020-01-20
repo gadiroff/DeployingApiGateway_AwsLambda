@@ -14,28 +14,6 @@ provider "aws" {
   secret_key = "${var.aws_secret_access_key}"
 }
 
-
-
-# ######################
-# ### Lambda Archive ###
-# ######################
-
-
-# resource "local_file" "latest_zip" {
-#   filename = "${path.module}/latest.js"
-# }
-
-
-# data "archive_file" "lambda_archive" {
-#   type        = "zip"
-#   output_path = "${path.module}/latest.zip"
-
-#   source {
-#     content  = "console.log('Hello World')"
-#     filename = "latest.js"
-#   }
-# }
-
   
 ###########################
 ### AWS Lambda Function ###
@@ -148,6 +126,10 @@ resource "aws_iam_policy_attachment" "article_rating_service_lambda_attach" {
 resource "aws_api_gateway_rest_api" "main" {
   name        = "${var.role}-${var.env}"
   description = "${var.role}-${var.env}"
+
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
 }
 
 
@@ -203,7 +185,7 @@ resource "aws_api_gateway_integration" "lambda" {
 
 
  resource "aws_lambda_permission" "apigw" {
-   statement_id  = "AllowAPIGatewayInvoke"
+   statement_id  = "AllowmainInvoke"
    action        = "lambda:InvokeFunction"
    function_name = "${aws_lambda_function.article_rating_service_lambda_function.arn}"
    principal     = "apigateway.amazonaws.com"
