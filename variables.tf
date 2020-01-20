@@ -1,14 +1,14 @@
 variable "role" {
-  default = "article-rating-service"
+  default = "testt"
 }
 
 
 variable "finance_product" {
-   default = "article-rating-service"
+   default = "testt"
 }
 
 variable "finance_owner" {
-  default = "online-web"
+  default = "web"
 }
 
 variable "tier" {
@@ -33,10 +33,10 @@ variable "security_groups" {
 ###########################
 
 
-variable "article_rating_service" {
+variable "testt" {
   default = {
-    name               = "article-rating-service"
-    s3_bucket          = "epic-lambda-artifacts"
+    name               = "testt"
+    s3_bucket          = "testt-lambda-artifacts"
     timeout            = 60
     memory_size        = 256
   }
@@ -61,7 +61,7 @@ variable "pgpassword" {
 }
 
 variable "pgdatabase" {
-  default = "ratings"
+  default = "testt"
 }
 
 variable "pgport" {
