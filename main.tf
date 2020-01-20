@@ -1,8 +1,8 @@
 terraform {
   backend "s3" {
-    bucket         = "ton-tf-test"
-    key            = "tf-projects/test"
-    dynamodb_table = "ton-tf-test"
+    bucket         = "ton-tf-state"
+    key            = "tf-projects/article-rating-service"
+    dynamodb_table = "ton-tf-state"
     region         = "us-east-1"
   }
 }
@@ -19,14 +19,14 @@ provider "aws" {
 ### AWS Lambda Function ###
 ###########################
 
-resource "aws_lambda_function" "testt_lambda_function" {           
-  function_name = "${var.testt["name"]}-${var.env}"
-  role          = "${aws_iam_role.testt_lambda_role.arn}"
-  s3_bucket     = "${var.testt["s3_bucket"]}"
-  s3_key        = "testt/${var.env}/testt.zip"   
-  handler       = "handler.createTesTT"
-  timeout       = "${var.testt["timeout"]}"
-  memory_size   = "${var.testt["memory_size"]}"
+resource "aws_lambda_function" "article_rating_service_lambda_function" {           
+  function_name = "${var.article_rating_service["name"]}-${var.env}"
+  role          = "${aws_iam_role.article_rating_service_lambda_role.arn}"
+  s3_bucket     = "${var.article_rating_service["s3_bucket"]}"
+  s3_key        = "article-rating-service/${var.env}/article-rating-service.zip"   
+  handler       = "handler.createArticleRating"
+  timeout       = "${var.article_rating_service["timeout"]}"
+  memory_size   = "${var.article_rating_service["memory_size"]}"
 
   runtime = "nodejs12.x"
 
@@ -38,11 +38,11 @@ resource "aws_lambda_function" "testt_lambda_function" {
 
   environment = {
     variables = {
-      "PGUSER"    = "${var.pguser}"
-      "PGHOST"        = "${var.pghost}"
-      "PGPASSWORD"     = "${var.pgpassword}"
-      "PGDATABASE"  = "${var.pgdatabase}"
-      "PGPORT"  = "${var.pgport}"
+      "EPIC_PST_SSP_PGUSER"    = "${var.pguser}"
+      "EPIC_PST_SSP_PGHOST"        = "${var.pghost}"
+      "EPIC_PST_SSP_PGPASSWORD"     = "${var.pgpassword}"
+      "EPIC_PST_SSP_PGDATABASE"  = "${var.pgdatabase}"
+      "EPIC_PST_SSP_PGPORT"  = "${var.pgport}"
 
     }
   }
@@ -52,16 +52,16 @@ resource "aws_lambda_function" "testt_lambda_function" {
 tags {
     Role                      = "${var.role}-${var.env}"
     Tier                      = "${var.tier}"
-    "Environment" = "${var.env}"
-    "Product"     = "${var.finance_product}"
-    "Owner"       = "${var.finance_owner}"
+    "EpicFinance:Environment" = "${var.env}"
+    "EpicFinance:Product"     = "${var.finance_product}"
+    "EpicFinance:Owner"       = "${var.finance_owner}"
   }
 
 }
 
 
-resource "aws_iam_role" "testt_lambda_role" {
-  name = "testt-lambda-${var.env}-role"
+resource "aws_iam_role" "article_rating_service_lambda_role" {
+  name = "article-rating-service-lambda-${var.env}-role"
 
  assume_role_policy = <<EOF
 {
@@ -82,17 +82,17 @@ EOF
   tags {
     Role                      = "${var.role}-${var.env}"
     Tier                      = "${var.tier}"
-    "Environment" = "${var.env}"
-    "Product"     = "${var.finance_product}"
-    "Owner"       = "${var.finance_owner}"
+    "EpicFinance:Environment" = "${var.env}"
+    "EpicFinance:Product"     = "${var.finance_product}"
+    "EpicFinance:Owner"       = "${var.finance_owner}"
   }
   
 }
 
 
 
-resource "aws_iam_policy" "testt_lambda_policy" {
-  name = "testt-lambda-${var.env}-policy"
+resource "aws_iam_policy" "article_rating_service_lambda_policy" {
+  name = "article-rating-service-lambda-${var.env}-policy"
   path        = "/"
 
 
@@ -111,10 +111,10 @@ EOF
 }
 
 
-resource "aws_iam_policy_attachment" "testt_lambda_attach" {
-  name       = "testt-lambda-attachment"
-  roles      = ["${aws_iam_role.testt_lambda_role.name}"]
-  policy_arn = "${aws_iam_policy.testt_lambda_policy.arn}"
+resource "aws_iam_policy_attachment" "article_rating_service_lambda_attach" {
+  name       = "article-rating-service-lambda-attachment"
+  roles      = ["${aws_iam_role.article_rating_service_lambda_role.name}"]
+  policy_arn = "${aws_iam_policy.article_rating_service_lambda_policy.arn}"
 }
 
 
@@ -146,6 +146,7 @@ resource "aws_api_gateway_method" "main" {
    resource_id   = "${aws_api_gateway_resource.main.id}"
    http_method   = "ANY"
    authorization = "NONE"
+   api_key_required = true
  }
 
 
@@ -158,7 +159,7 @@ resource "aws_api_gateway_integration" "lambda" {
 
    integration_http_method = "POST"
    type                    = "AWS_PROXY"
-   uri                     = "${aws_lambda_function.testt_lambda_function.invoke_arn}"
+   uri                     = "${aws_lambda_function.article_rating_service_lambda_function.invoke_arn}"
  }
 
 
@@ -169,6 +170,7 @@ resource "aws_api_gateway_integration" "lambda" {
    resource_id   = "${aws_api_gateway_rest_api.main.root_resource_id}"
    http_method   = "ANY"
    authorization = "NONE"
+   api_key_required = true
  }
 
  resource "aws_api_gateway_integration" "lambda_root" {
@@ -178,7 +180,7 @@ resource "aws_api_gateway_integration" "lambda" {
 
    integration_http_method = "POST"
    type                    = "AWS_PROXY"
-   uri                     = "${aws_lambda_function.testt_lambda_function.invoke_arn}"
+   uri                     = "${aws_lambda_function.article_rating_service_lambda_function.invoke_arn}"
  }
 
 
@@ -187,7 +189,7 @@ resource "aws_api_gateway_integration" "lambda" {
  resource "aws_lambda_permission" "apigw" {
    statement_id  = "AllowmainInvoke"
    action        = "lambda:InvokeFunction"
-   function_name = "${aws_lambda_function.testt_lambda_function.arn}"
+   function_name = "${aws_lambda_function.article_rating_service_lambda_function.arn}"
    principal     = "apigateway.amazonaws.com"
 
    
@@ -208,3 +210,36 @@ resource "aws_api_gateway_integration" "lambda" {
 
 
 
+
+
+resource "aws_api_gateway_usage_plan" "main" {
+  name = "${var.role}-${var.env}-usage-plan"
+
+  api_stages {
+    api_id = "${aws_api_gateway_rest_api.main.id}"
+    stage  = "${aws_api_gateway_deployment.main.stage_name}"
+  }
+
+  depends_on = [
+     "aws_api_gateway_deployment.main"
+   ]
+}
+
+resource "aws_api_gateway_api_key" "main" {
+  name = "${var.role}-${var.env}-api-key"
+
+  depends_on = [
+     "aws_api_gateway_deployment.main"
+   ]
+}
+
+
+resource "aws_api_gateway_usage_plan_key" "main" {
+  key_id        = "${aws_api_gateway_api_key.main.id}"
+  key_type      = "API_KEY"
+  usage_plan_id = "${aws_api_gateway_usage_plan.main.id}"
+
+  depends_on = [
+     "aws_api_gateway_deployment.main"
+   ]
+}
