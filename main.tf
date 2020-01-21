@@ -1,8 +1,8 @@
 terraform {
   backend "s3" {
-    bucket         = "ton-tf-state"
-    key            = "tf-projects/article-rating-service"
-    dynamodb_table = "ton-tf-state"
+    bucket         = "test-state"
+    key            = "tf-projects/testt"
+    dynamodb_table = "test-state"
     region         = "us-east-1"
   }
 }
@@ -19,14 +19,14 @@ provider "aws" {
 ### AWS Lambda Function ###
 ###########################
 
-resource "aws_lambda_function" "article_rating_service_lambda_function" {           
-  function_name = "${var.article_rating_service["name"]}-${var.env}"
-  role          = "${aws_iam_role.article_rating_service_lambda_role.arn}"
-  s3_bucket     = "${var.article_rating_service["s3_bucket"]}"
-  s3_key        = "article-rating-service/${var.env}/article-rating-service.zip"   
-  handler       = "handler.createArticleRating"
-  timeout       = "${var.article_rating_service["timeout"]}"
-  memory_size   = "${var.article_rating_service["memory_size"]}"
+resource "aws_lambda_function" "te_s_tt_lambda_function" {           
+  function_name = "${var.te_s_tt["name"]}-${var.env}"
+  role          = "${aws_iam_role.te_s_tt_lambda_role.arn}"
+  s3_bucket     = "${var.te_s_tt["s3_bucket"]}"
+  s3_key        = "testt/${var.env}/testt.zip"   
+  handler       = "handler.createTesttRating"
+  timeout       = "${var.te_s_tt["timeout"]}"
+  memory_size   = "${var.te_s_tt["memory_size"]}"
 
   runtime = "nodejs12.x"
 
@@ -38,11 +38,12 @@ resource "aws_lambda_function" "article_rating_service_lambda_function" {
 
   environment = {
     variables = {
-      "EPIC_PST_SSP_PGUSER"    = "${var.pguser}"
-      "EPIC_PST_SSP_PGHOST"        = "${var.pghost}"
-      "EPIC_PST_SSP_PGPASSWORD"     = "${var.pgpassword}"
-      "EPIC_PST_SSP_PGDATABASE"  = "${var.pgdatabase}"
-      "EPIC_PST_SSP_PGPORT"  = "${var.pgport}"
+      "TESTT_PGUSER"    = "${var.pguser}"
+      "TESTT_PGHOST"        = "${aws_db_instance.postgres.address}"
+      "TESTT_PGPASSWORD"     = "${var.pgpassword}"
+      "TESTT_PGDATABASE"  = "te_s_tt_${var.env}"
+      "TESTT_PGPORT"  = "${var.pgport}"
+
 
     }
   }
@@ -52,16 +53,16 @@ resource "aws_lambda_function" "article_rating_service_lambda_function" {
 tags {
     Role                      = "${var.role}-${var.env}"
     Tier                      = "${var.tier}"
-    "EpicFinance:Environment" = "${var.env}"
-    "EpicFinance:Product"     = "${var.finance_product}"
-    "EpicFinance:Owner"       = "${var.finance_owner}"
+    "TESTTFinance:Environment" = "${var.env}"
+    "TESTTFinance:Product"     = "${var.finance_product}"
+    "TESTTFinance:Owner"       = "${var.finance_owner}"
   }
 
 }
 
 
-resource "aws_iam_role" "article_rating_service_lambda_role" {
-  name = "article-rating-service-lambda-${var.env}-role"
+resource "aws_iam_role" "te_s_tt_lambda_role" {
+  name = "testt-lambda-${var.env}-role"
 
  assume_role_policy = <<EOF
 {
@@ -82,17 +83,17 @@ EOF
   tags {
     Role                      = "${var.role}-${var.env}"
     Tier                      = "${var.tier}"
-    "EpicFinance:Environment" = "${var.env}"
-    "EpicFinance:Product"     = "${var.finance_product}"
-    "EpicFinance:Owner"       = "${var.finance_owner}"
+    "TESTTFinance:Environment" = "${var.env}"
+    "TESTTFinance:Product"     = "${var.finance_product}"
+    "TESTTFinance:Owner"       = "${var.finance_owner}"
   }
   
 }
 
 
 
-resource "aws_iam_policy" "article_rating_service_lambda_policy" {
-  name = "article-rating-service-lambda-${var.env}-policy"
+resource "aws_iam_policy" "te_s_tt_lambda_policy" {
+  name = "testt-lambda-${var.env}-policy"
   path        = "/"
 
 
@@ -111,10 +112,10 @@ EOF
 }
 
 
-resource "aws_iam_policy_attachment" "article_rating_service_lambda_attach" {
-  name       = "article-rating-service-lambda-attachment"
-  roles      = ["${aws_iam_role.article_rating_service_lambda_role.name}"]
-  policy_arn = "${aws_iam_policy.article_rating_service_lambda_policy.arn}"
+resource "aws_iam_policy_attachment" "te_s_tt_lambda_attach" {
+  name       = "testt-lambda-attachment"
+  roles      = ["${aws_iam_role.te_s_tt_lambda_role.name}"]
+  policy_arn = "${aws_iam_policy.te_s_tt_lambda_policy.arn}"
 }
 
 
@@ -159,7 +160,9 @@ resource "aws_api_gateway_integration" "lambda" {
 
    integration_http_method = "POST"
    type                    = "AWS_PROXY"
-   uri                     = "${aws_lambda_function.article_rating_service_lambda_function.invoke_arn}"
+   uri                     = "${aws_lambda_function.te_s_tt_lambda_function.invoke_arn}"
+
+   content_handling = "CONVERT_TO_TEXT"
  }
 
 
@@ -180,7 +183,9 @@ resource "aws_api_gateway_integration" "lambda" {
 
    integration_http_method = "POST"
    type                    = "AWS_PROXY"
-   uri                     = "${aws_lambda_function.article_rating_service_lambda_function.invoke_arn}"
+   uri                     = "${aws_lambda_function.te_s_tt_lambda_function.invoke_arn}"
+
+   content_handling = "CONVERT_TO_TEXT"
  }
 
 
@@ -189,7 +194,7 @@ resource "aws_api_gateway_integration" "lambda" {
  resource "aws_lambda_permission" "apigw" {
    statement_id  = "AllowmainInvoke"
    action        = "lambda:InvokeFunction"
-   function_name = "${aws_lambda_function.article_rating_service_lambda_function.arn}"
+   function_name = "${aws_lambda_function.te_s_tt_lambda_function.arn}"
    principal     = "apigateway.amazonaws.com"
 
    
@@ -242,4 +247,40 @@ resource "aws_api_gateway_usage_plan_key" "main" {
   depends_on = [
      "aws_api_gateway_deployment.main"
    ]
+}
+
+
+
+##############################
+####### Postgre RD ###########
+##############################
+
+
+resource "aws_db_instance" "postgres" {
+  allocated_storage      = "${var.allocated_storage}"
+  db_subnet_group_name   = "${aws_db_subnet_group.postgres.id}"
+  engine                 = "postgres"
+  engine_version         = "${var.postgres_version}"
+  instance_class         = "${var.instance_class}"
+  multi_az               = "${var.multi_az}"
+  name                   = "te_s_tt_${var.env}"
+  password               = "${var.pgpassword}"
+  port                   = "${var.pgport}"
+  identifier             = "${var.role}-${var.env}"
+  publicly_accessible    = "${var.publicly_accessible}"
+  storage_encrypted      = "${var.storage_encrypted}"
+  storage_type           = "${var.storage_type}"
+  username               = "${var.pguser}"
+
+  vpc_security_group_ids = [
+    "${var.security_groups}"
+  ]
+
+  tags {
+    Role                      = "${var.role}"
+    Tier                      = "${var.tier}"
+    "TESTTFinance:Environment" = "${var.env}"
+    "TESTTFinance:Product"     = "${var.finance_product}"
+    "TESTTFinance:Owner"       = "${var.finance_owner}"
+  }
 }
