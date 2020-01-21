@@ -10,3 +10,7 @@ security_groups = [
   "sg-0", # test_mgt_nets
   "sg-6", # test_cd_nets
 ]
+
+aws_ec2_zone_id = "qwert123w3es" # private - ck.test.net.
+
+domain = "ck.test.net"
